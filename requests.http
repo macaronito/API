@@ -1,0 +1,171 @@
+### Learner 61, page 1 - expect 10 lessons
+GET http://localhost:3000/api/learners/61/lessons/upcoming
+
+### Learner 61, page 3 - expect the last 6 lessons
+GET http://localhost:3000/api/learners/61/lessons/upcoming?page=3
+
+### Learner 61, 5 per page
+GET http://localhost:3000/api/learners/61/lessons/upcoming?page=2&limit=5
+
+### Page past the end - expect an empty list
+GET http://localhost:3000/api/learners/61/lessons/upcoming?page=9
+
+### Learner 62 - no upcoming lessons, expect an empty list
+GET http://localhost:3000/api/learners/62/lessons/upcoming
+
+### User 1 is a tutor - expect 404
+GET http://localhost:3000/api/learners/1/lessons/upcoming
+
+### Learner that doesn't exist - expect 404
+GET http://localhost:3000/api/learners/9999/lessons/upcoming
+
+### Invalid ID - expect 400
+GET http://localhost:3000/api/learners/abc/lessons/upcoming
+
+### Invalid page - expect 400
+GET http://localhost:3000/api/learners/61/lessons/upcoming?page=0
+
+### Limit too large - expect 400
+GET http://localhost:3000/api/learners/61/lessons/upcoming?limit=500
+
+### Unknown route - expect 404
+GET http://localhost:3000/api/nothing
+
+// ---------- // ---------- //
+
+### SPRINT 2
+
+### Tutor 7's languages - expect 200, Korean
+GET http://localhost:3000/api/tutors/7/languages
+
+### Tutor not approved - expect 404
+GET http://localhost:3000/api/tutors/52/languages
+
+### Book a lesson - expect 201
+POST http://localhost:3000/api/learners/61/lessons
+Content-Type: application/json
+
+{ "tutorId": 7, "languageId": 2, "level": "B1", "startTime": "2026-11-25T18:00:00Z", "durationMinutes": 60 }
+
+### Same booking again - expect 409
+POST http://localhost:3000/api/learners/61/lessons
+Content-Type: application/json
+
+{ "tutorId": 7, "languageId": 2, "level": "B1", "startTime": "2026-11-25T18:00:00Z", "durationMinutes": 60 }
+
+### Tutor already has a lesson 15:00-16:00 - expect 409
+POST http://localhost:3000/api/learners/62/lessons
+Content-Type: application/json
+
+{ "tutorId": 7, "languageId": 2, "level": "A1", "startTime": "2026-11-22T15:30:00Z", "durationMinutes": 30 }
+
+### Ends just as the tutor's next lesson starts - expect 201
+POST http://localhost:3000/api/learners/62/lessons
+Content-Type: application/json
+
+{ "tutorId": 7, "languageId": 2, "level": "A1", "startTime": "2026-11-22T14:30:00Z", "durationMinutes": 30 }
+
+### Learner already has a lesson at 09:00 - expect 409
+POST http://localhost:3000/api/learners/61/lessons
+Content-Type: application/json
+
+{ "tutorId": 1, "languageId": 1, "level": "A2", "startTime": "2026-11-16T09:00:00Z", "durationMinutes": 30 }
+
+### Same time as a cancelled lesson - expect 201
+POST http://localhost:3000/api/learners/62/lessons
+Content-Type: application/json
+
+{ "tutorId": 10, "languageId": 2, "level": "A2", "startTime": "2026-11-14T09:00:00Z", "durationMinutes": 30 }
+
+### Time with +00:00 instead of Z - expect 201
+POST http://localhost:3000/api/learners/63/lessons
+Content-Type: application/json
+
+{ "tutorId": 23, "languageId": 5, "level": "C1", "startTime": "2026-11-26T19:00:00+00:00", "durationMinutes": 30 }
+
+### Tutor doesn't teach that language - expect 400
+POST http://localhost:3000/api/learners/61/lessons
+Content-Type: application/json
+
+{ "tutorId": 7, "languageId": 1, "level": "B1", "startTime": "2026-11-27T18:00:00Z", "durationMinutes": 60 }
+
+### Tutor not approved - expect 400
+POST http://localhost:3000/api/learners/61/lessons
+Content-Type: application/json
+
+{ "tutorId": 52, "languageId": 11, "level": "B1", "startTime": "2026-11-27T18:00:00Z", "durationMinutes": 60 }
+
+### tutorId is a learner - expect 400
+POST http://localhost:3000/api/learners/61/lessons
+Content-Type: application/json
+
+{ "tutorId": 62, "languageId": 2, "level": "B1", "startTime": "2026-11-27T18:00:00Z", "durationMinutes": 60 }
+
+### Learner that doesn't exist - expect 404
+POST http://localhost:3000/api/learners/9999/lessons
+Content-Type: application/json
+
+{ "tutorId": 7, "languageId": 2, "level": "B1", "startTime": "2026-11-27T18:00:00Z", "durationMinutes": 60 }
+
+### Learner ID is a tutor - expect 404
+POST http://localhost:3000/api/learners/7/lessons
+Content-Type: application/json
+
+{ "tutorId": 8, "languageId": 2, "level": "B1", "startTime": "2026-11-27T18:00:00Z", "durationMinutes": 60 }
+
+### Invalid learner ID - expect 400
+POST http://localhost:3000/api/learners/abc/lessons
+Content-Type: application/json
+
+{ "tutorId": 7, "languageId": 2, "level": "B1", "startTime": "2026-11-27T18:00:00Z", "durationMinutes": 60 }
+
+### Level D1 - expect 400
+POST http://localhost:3000/api/learners/61/lessons
+Content-Type: application/json
+
+{ "tutorId": 7, "languageId": 2, "level": "D1", "startTime": "2026-11-27T18:00:00Z", "durationMinutes": 60 }
+
+### 45 minutes - expect 400
+POST http://localhost:3000/api/learners/61/lessons
+Content-Type: application/json
+
+{ "tutorId": 7, "languageId": 2, "level": "B1", "startTime": "2026-11-27T18:00:00Z", "durationMinutes": 45 }
+
+### Length as text - expect 400
+POST http://localhost:3000/api/learners/61/lessons
+Content-Type: application/json
+
+{ "tutorId": 7, "languageId": 2, "level": "B1", "startTime": "2026-11-27T18:00:00Z", "durationMinutes": "60" }
+
+### No time zone - expect 400
+POST http://localhost:3000/api/learners/61/lessons
+Content-Type: application/json
+
+{ "tutorId": 7, "languageId": 2, "level": "B1", "startTime": "2026-11-27T18:00", "durationMinutes": 60 }
+
+### In the past - expect 400
+POST http://localhost:3000/api/learners/61/lessons
+Content-Type: application/json
+
+{ "tutorId": 7, "languageId": 2, "level": "B1", "startTime": "2026-01-10T18:00:00Z", "durationMinutes": 60 }
+
+### Month 13 - expect 400
+POST http://localhost:3000/api/learners/61/lessons
+Content-Type: application/json
+
+{ "tutorId": 7, "languageId": 2, "level": "B1", "startTime": "2026-13-45T18:00:00Z", "durationMinutes": 60 }
+
+### 30 February - expect 400
+POST http://localhost:3000/api/learners/61/lessons
+Content-Type: application/json
+
+{ "tutorId": 7, "languageId": 2, "level": "B1", "startTime": "2027-02-30T18:00:00Z", "durationMinutes": 60 }
+
+### Empty body - expect 400
+POST http://localhost:3000/api/learners/61/lessons
+Content-Type: application/json
+
+{ }
+
+### New lesson shows in upcoming lessons - expect the 25 Nov 18:00 lesson in the list
+GET http://localhost:3000/api/learners/61/lessons/upcoming?limit=50

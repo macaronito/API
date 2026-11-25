@@ -1,16 +1,15 @@
 import express from 'express';
 import cors from 'cors';
-import { getUpcomingLessons, bookLesson } from './controllers/lessons-controller.js';
-import { getTutorLanguages } from './controllers/tutors-controller.js';
+import learnersRouter from './routes/learners-router.js';
+import tutorsRouter from './routes/tutors-router.js';
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 // ----- ENDPOINTS
-app.get('/api/learners/:id/lessons/upcoming', getUpcomingLessons);
-app.post('/api/learners/:id/lessons', bookLesson);
-app.get('/api/tutors/:id/languages', getTutorLanguages);
+app.use('/api/learners', learnersRouter);
+app.use('/api/tutors', tutorsRouter);
 
 // ----- ANY OTHER ROUTE
 app.use((req, res) =>
